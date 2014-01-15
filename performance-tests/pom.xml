@@ -110,6 +110,162 @@
 
     <profiles>
 
+        <!-- tools-generate-test-data -->
+        <profile>
+            <id>tools-generate-test-data</id>
+
+            <properties>
+                <osiam.properties.file>osiam_h2.properties</osiam.properties.file>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${version.com.h2database}</version>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <!-- copies osiam_h2.properties into file osiam.properties -->
+                    <plugin>
+                        <groupId>com.github.goldin</groupId>
+                        <artifactId>copy-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>setup-osiam-webapps</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- starts the h2 database -->
+                    <plugin>
+                        <groupId>com.edugility</groupId>
+                        <artifactId>h2-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>spawn-h2</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>spawn</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- starts the jetty for the OSIAM server -->
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.h2database</groupId>
+                                <artifactId>h2</artifactId>
+                                <version>${version.com.h2database}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>start-jetty</id>
+                                <phase>pre-integration-test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- creates the test data and saves them into the database -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>org.osiam.performance.tools.TestDataCreation</mainClass>
+                        </configuration>
+                    </plugin>
+
+                   <!-- creates the database seed from the created data in the database -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>dbunit-maven-plugin</artifactId>
+                        <version>1.0-beta-3</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.h2database</groupId>
+                                <artifactId>h2</artifactId>
+                                <version>${version.com.h2database}</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <dataTypeFactoryName>org.dbunit.ext.h2.H2DataTypeFactory</dataTypeFactoryName>
+                            <driver>org.h2.Driver</driver>
+                            <url>jdbc:h2:tcp://localhost/mem:osiam</url>
+                            <username>sa</username>
+                            <password>sa</password>
+                            <format>flat</format>
+                            <ordered>true</ordered>
+                            <dest>src/main/resources/database_seed.xml</dest>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>dump</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>export</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- stops the jetty -->
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.h2database</groupId>
+                                <artifactId>h2</artifactId>
+                                <version>${version.com.h2database}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>stop-jetty</id>
+                                <phase>post-integration-test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- shuts down the h2 database -->
+                    <plugin>
+                        <groupId>com.edugility</groupId>
+                        <artifactId>h2-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>stop-h2</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Local Server + H2 Database -->
         <profile>
             <id>local-h2</id>
@@ -189,6 +345,17 @@
                         </executions>
                     </plugin>
 
+                    <plugin>
+                        <groupId>com.lazerycode.jmeter</groupId>
+                        <artifactId>jmeter-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jmeter-tests</id>
+                                <phase>integration-test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>
@@ -246,10 +413,21 @@
                             </execution>
                         </executions>
                     </plugin>
+
+                    <plugin>
+                        <groupId>com.lazerycode.jmeter</groupId>
+                        <artifactId>jmeter-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jmeter-tests</id>
+                                <phase>integration-test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 
     <build>
@@ -394,7 +572,7 @@
                         <execution>
                             <id>start-jetty</id>
                             <goals>
-                                <goal>run-exploded</goal>
+                                <goal>start</goal>
                             </goals>
                             <configuration>
                                 <scanIntervalSeconds>0</scanIntervalSeconds>
@@ -406,6 +584,26 @@
                             <goals>
                                 <goal>stop</goal>
                             </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.lazerycode.jmeter</groupId>
+                    <artifactId>jmeter-maven-plugin</artifactId>
+                    <version>1.8.1</version>
+                    <executions>
+                        <execution>
+                            <id>jmeter-tests</id>
+                            <goals>
+                                <goal>jmeter</goal>
+                            </goals>
+                            <configuration>
+                                <propertiesJMeter>
+                                    <jmeter.exit.check.pause>10000</jmeter.exit.check.pause>
+                                </propertiesJMeter>
+                                <testResultsTimestamp>false</testResultsTimestamp>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -459,22 +657,6 @@
             <plugin>
                 <groupId>com.lazerycode.jmeter</groupId>
                 <artifactId>jmeter-maven-plugin</artifactId>
-                <version>1.8.1</version>
-                <configuration>
-                    <propertiesJMeter>
-                        <jmeter.exit.check.pause>10000</jmeter.exit.check.pause>
-                    </propertiesJMeter>
-                    <testResultsTimestamp>false</testResultsTimestamp>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>jmeter-tests</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>jmeter</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -484,10 +666,7 @@
                 <executions>
                     <execution>
                         <id>jmeter-results-analysis</id>
-                        <!-- <phase>verify</phase>
-                        <goals>
-                            <goal>analyze</goal>
-                        </goals> -->
+                        <!-- <phase>verify</phase> <goals> <goal>analyze</goal> </goals> -->
                         <configuration>
                             <source>${project.build.directory}/jmeter/results/*.jtl</source>
                             <targetDirectory>${project.build.directory}/jmeter-reports</targetDirectory>
