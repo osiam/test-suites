@@ -1,4 +1,4 @@
-package org.osiam.performance.tools;
+package org.osiam.tests.performance.tools;
 
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
