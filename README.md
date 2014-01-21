@@ -1,4 +1,4 @@
-test-collection
+test-suites
 ===============
 
 performance and integration tests
