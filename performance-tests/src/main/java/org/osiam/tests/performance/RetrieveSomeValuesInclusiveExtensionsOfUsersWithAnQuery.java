@@ -23,21 +23,28 @@
 
 package org.osiam.tests.performance;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertThat;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import org.junit.Test;
+import org.osiam.resources.scim.User;
 
-public class RetrieveListOfUsersWithComplexQueryContainingExtension extends AbstractPerformanceTest {
+public class RetrieveSomeValuesInclusiveExtensionsOfUsersWithAnQuery extends AbstractPerformanceTest {
 
     @Test
     public void run() throws UnsupportedEncodingException {
         String queryString = "filter=" + URLEncoder.encode("meta.created gt \"2011-10-10T00:00:00.000\""
                 + " and (userName co \"er3\" or userName co \"4\")"
-                + " and (emails sw \"email3\" and emails.type eq \"work\")"
-                + " and urn:scim:extension:perfomance.stringValue sw \"Hello\""
-                + " and urn:scim:extension:perfomance.integerValue gt 100", "UTF-8");
-
-        osiamConnector.searchUsers(queryString, accessToken);
+                + " and (emails sw \"email3\" and emails.type eq \"work\")", "UTF-8")
+                + "&attributes="
+                + URLEncoder.encode("userName, displayName, emails, urn:scim:extension:perfomance", "UTF-8");
+        List<User> users = osiamConnector.searchUsers(queryString, accessToken).getResources();
+        assertThat(users.size(), greaterThan(50));
+        assertThat(users.size(), lessThan(150));
     }
 }
