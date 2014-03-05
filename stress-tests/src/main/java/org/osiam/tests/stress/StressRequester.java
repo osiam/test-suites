@@ -19,35 +19,37 @@ public class StressRequester {
 
     public static void main(String[] args) {
 
-        int number = 1;
-        JobDetail job = getRequesterJob(number);
-        Trigger trigger = getTrigger(1000, number);
-
-        number++;
-        JobDetail job2 = getRequesterJob(number);
-        Trigger trigger2 = getTrigger(500, number);
+        int number = 0;
 
         try {
             Scheduler scheduler;
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
-            scheduler.scheduleJob(job, trigger);
-            scheduler.scheduleJob(job2, trigger2);
+            
+            addJob(scheduler, 500, number++);
+            addJob(scheduler, 701, number++);
+            addJob(scheduler, 902, number++);
+            addJob(scheduler, 1103, number++);
+            addJob(scheduler, 1304, number++);
+
+            addJob(scheduler, 555, number++);
+            addJob(scheduler, 756, number++);
+            addJob(scheduler, 957, number++);
+            addJob(scheduler, 1158, number++);
+            addJob(scheduler, 1359, number++);
         } catch (SchedulerException e) {
+            e.printStackTrace();
             System.out.print(e.getMessage());
         }
 
     }
     
-    private static JobDetail getRequesterJob(int number){
-        JobDetail job = newJob(RequesterJob.class)
+    private static void addJob(Scheduler scheduler, long milliSeconds, int number) throws SchedulerException{
+        
+        JobDetail job =  newJob(RequesterJob.class)
                 .withIdentity("job" + number, "group" + number)
                 .build();
         
-        return job;
-    }
-    
-    private static Trigger getTrigger(long milliSeconds, int number){
         Trigger trigger = newTrigger()
                 .withIdentity("trigger" + number, "group" + number)
                 .startNow()
@@ -56,7 +58,7 @@ public class StressRequester {
                         .repeatForever())
                 .build();
         
-        return trigger;
+        scheduler.scheduleJob(job, trigger);
     }
 
 }
