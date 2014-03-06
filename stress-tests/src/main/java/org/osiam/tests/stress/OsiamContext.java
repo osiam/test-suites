@@ -1,6 +1,7 @@
 package org.osiam.tests.stress;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.osiam.client.connector.OsiamConnector;
@@ -17,6 +18,8 @@ public class OsiamContext {
     private static final String CLIENT_SECRET = "secret";
 
     private AccessToken accessToken = null;
+    private HashMap<String, OsiamConnector> connectors = new HashMap<String, OsiamConnector>();
+    
     private List<User> users = new ArrayList<User>();
 
     private OsiamContext() {
@@ -29,7 +32,9 @@ public class OsiamContext {
         return mySingelton;
     }
 
-    public OsiamConnector getConnector() {
+    public OsiamConnector getConnector(String key) {
+        OsiamConnector osiamConnector = connectors.get(key);
+        if(osiamConnector == null){
         OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
                 setAuthServiceEndpoint(AUTH_ENDPOINT_ADDRESS).
                 setResourceEndpoint(RESOURCE_ENDPOINT_ADDRESS).
@@ -39,17 +44,19 @@ public class OsiamContext {
                 setUserName("marissa").
                 setPassword("koala").
                 setScope(Scope.ALL);
-        OsiamConnector oConnector = oConBuilder.build();
-        return oConnector;
+        osiamConnector = oConBuilder.build();
+        connectors.put(key, osiamConnector);
+        }
+        return osiamConnector;
     }
 
     public AccessToken getValidAccessToken() {
         if (accessToken == null)
         {
-            accessToken = getConnector().retrieveAccessToken();
+            accessToken = getConnector("accessToken").retrieveAccessToken();
         }
         if (accessToken.isExpired()) {
-            getConnector().refreshAccessToken(accessToken, Scope.ALL);
+            getConnector("accessToken").refreshAccessToken(accessToken, Scope.ALL);
         }
         return accessToken;
     }

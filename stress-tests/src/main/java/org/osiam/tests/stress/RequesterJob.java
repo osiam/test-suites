@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.oauth.AccessToken;
 import org.osiam.resources.scim.Address;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Entitlement;
@@ -28,16 +30,16 @@ import com.google.common.base.Strings;
 
 public class RequesterJob implements Job {
 
-    private OsiamContext osiamContext;
     private String jobName;
+    private OsiamConnector osiamConnector;
+    private AccessToken accessToken;
     private static final String EXTENSION_URN = "com.osiam.stress.test";
-
-    public RequesterJob() {
-        osiamContext = OsiamContext.getInstance();
-    }
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
         jobName = context.getJobDetail().getKey().getName();
+        osiamConnector = OsiamContext.getInstance().getConnector(jobName);
+        accessToken = OsiamContext.getInstance().getValidAccessToken();
+        
         try {
             int i = (int) (Math.random() * 30 + 1);
 
@@ -65,7 +67,7 @@ public class RequesterJob implements Job {
         System.out.println(jobName + ": Creating a new User");
 
         User user = getRandomUser();
-        osiamContext.getConnector().createUser(user, osiamContext.getValidAccessToken());
+        osiamConnector.createUser(user, accessToken);
     }
 
     private User getRandomUser() {
@@ -196,41 +198,41 @@ public class RequesterJob implements Job {
 
     private void updateUser() {
         System.out.println(jobName + ": Updating a User");
-        String userId = osiamContext.retrieveSingleUserId();
+        String userId = OsiamContext.getInstance().retrieveSingleUserId();
         if (!Strings.isNullOrEmpty(userId)) {
             UpdateUser updateUser = new UpdateUser.Builder().updateExternalId(UUID.randomUUID().toString()).build();
-            osiamContext.getConnector().updateUser(userId, updateUser, osiamContext.getValidAccessToken());
+            osiamConnector.updateUser(userId, updateUser, accessToken);
         }
     }
 
     private void replaceUser() {
         System.out.println(jobName + ": Replace a User");
-        String userId = osiamContext.retrieveSingleUserId();
+        String userId = OsiamContext.getInstance().retrieveSingleUserId();
         if (!Strings.isNullOrEmpty(userId)) {
             User replaceUser = getRandomUser();
-            osiamContext.getConnector().replaceUser(userId, replaceUser, osiamContext.getValidAccessToken());
+            osiamConnector.replaceUser(userId, replaceUser, accessToken);
         }
     }
 
     private void deleteUser() {
         System.out.println(jobName + ": deleting a User");
         System.out.println(jobName + ": get a Users");
-        String userId = osiamContext.retrieveSingleUserId();
+        String userId = OsiamContext.getInstance().retrieveSingleUserId();
         if (!Strings.isNullOrEmpty(userId)) {
-            osiamContext.getConnector().deleteUser(userId, osiamContext.getValidAccessToken());
+            osiamConnector.deleteUser(userId, accessToken);
         }
     }
 
     private void searchUser() throws UnsupportedEncodingException {
         System.out.println(jobName + ": searching for Users");
         String query = getCompletUserQueryString();
-        SCIMSearchResult<User> queryResult = osiamContext.getConnector().searchUsers("filter=" + query,
-                osiamContext.getValidAccessToken());
+        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers("filter=" + query,
+                accessToken);
         if (queryResult.getTotalResults() == 0) {
-            queryResult = osiamContext.getConnector().searchUsers("filter=",
-                    osiamContext.getValidAccessToken());
+            queryResult = osiamConnector.searchUsers("filter=",
+                    accessToken);
         }
-        osiamContext.setListOfUsers(queryResult.getResources());
+        OsiamContext.getInstance().setListOfUsers(queryResult.getResources());
     }
 
     private String getCompletUserQueryString() throws UnsupportedEncodingException {
@@ -243,9 +245,9 @@ public class RequesterJob implements Job {
 
     private void getUser() {
         System.out.println(jobName + ": get a Users");
-        String userId = osiamContext.retrieveSingleUserId();
+        String userId = OsiamContext.getInstance().retrieveSingleUserId();
         if (!Strings.isNullOrEmpty(userId)) {
-            osiamContext.getConnector().getUser(userId, osiamContext.getValidAccessToken());
+            osiamConnector.getUser(userId, accessToken);
         }
     }
 
