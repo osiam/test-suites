@@ -61,11 +61,11 @@ public class OsiamContext {
         return accessToken;
     }
 
-    public void setListOfUsers(List<User> users) {
+    public synchronized void setListOfUsers(List<User> users) {
         this.users = users;
     }
 
-    public String retrieveSingleUserId() {
+    public synchronized String retrieveSingleUserId() {
         String userId = null;
         if (users.size() > 0) {
             int randomPosition = (int) (Math.random() * users.size());
