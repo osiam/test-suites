@@ -11,7 +11,7 @@ import org.osiam.client.oauth.Scope;
 import org.osiam.resources.scim.User;
 
 public class OsiamContext {
-    private static OsiamContext mySingelton = null;
+    private static OsiamContext contextSingelton = null;
     private static final String AUTH_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-auth-server";
     private static final String RESOURCE_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-resource-server";
     private static final String CLIENT_ID = "example-client";
@@ -26,10 +26,10 @@ public class OsiamContext {
     }
 
     public static OsiamContext getInstance() {
-        if (mySingelton == null) {
-            mySingelton = new OsiamContext();
+        if (contextSingelton == null) {
+            contextSingelton = new OsiamContext();
         }
-        return mySingelton;
+        return contextSingelton;
     }
 
     public OsiamConnector getConnector(String key) {
@@ -68,7 +68,7 @@ public class OsiamContext {
     public String retrieveSingleUserId() {
         String userId = null;
         if (users.size() > 0) {
-            int randomPosition = (int) (Math.random() * users.size() + 1);
+            int randomPosition = (int) (Math.random() * users.size());
             User user = users.get(randomPosition);
             userId = user.getId();
             users.remove(randomPosition);
