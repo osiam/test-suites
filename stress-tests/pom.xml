@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.osiam.tests</groupId>
+    <artifactId>stress-tests</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>stress-tests</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+        <java.version>1.7</java.version>
+        
+        <!-- OSIAM -->
+        <osiam.connector4java.version>0.14-SNAPSHOT</osiam.connector4java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osiam</groupId>
+            <artifactId>connector4java</artifactId>
+            <version>${osiam.connector4java.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz-jobs</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+    </dependencies>
+</project>
