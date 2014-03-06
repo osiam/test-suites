@@ -36,7 +36,7 @@ import org.osiam.resources.scim.User;
 public class OsiamContext {
     private static OsiamContext contextSingelton = null;
     private static final String AUTH_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-auth-server";
-    private static final String RESOURCE_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-resource-server";
+    public static final String RESOURCE_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-resource-server";
     private static final String CLIENT_ID = "example-client";
     private static final String CLIENT_SECRET = "secret";
 
