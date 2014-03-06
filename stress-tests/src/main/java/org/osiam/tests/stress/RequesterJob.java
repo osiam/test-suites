@@ -20,13 +20,12 @@ public class RequesterJob implements Job {
     private String jobName;
     private OsiamConnector osiamConnector;
     private AccessToken accessToken;
-    
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
         jobName = context.getJobDetail().getKey().getName();
         osiamConnector = OsiamContext.getInstance().getConnector(jobName);
         accessToken = OsiamContext.getInstance().getValidAccessToken();
-        
+
         try {
             int i = (int) (Math.random() * 30 + 1);
 
@@ -40,33 +39,32 @@ public class RequesterJob implements Job {
                 updateUser();
             } else if (i > 28 && i <= 29) {
                 replaceUser();
-            } else if(i == 30){
+            } else if (i == 30) {
                 deleteUser();
             }
 
         } catch (Throwable e) {
             System.out.println("Error at Job " + jobName + ": " + e.getMessage());
             e.printStackTrace();
-            
+
         }
     }
 
     private void createNewUser() {
-        System.out.println(jobName + ": Creating a new User");
+        logMessage("Creating a new User");
 
         User user = RandomUser.getNewUser();
         osiamConnector.createUser(user, accessToken);
     }
-
-    
 
     private int getRandomNumber() {
         return (int) (Math.random() * 99 + 1);
     }
 
     private void updateUser() {
-        System.out.println(jobName + ": Updating a User");
+        logMessage("Updating a User");
         String userId = OsiamContext.getInstance().retrieveSingleUserId();
+        logMessage("try to update user with the id " + userId);
         if (!Strings.isNullOrEmpty(userId)) {
             UpdateUser updateUser = new UpdateUser.Builder().updateExternalId(UUID.randomUUID().toString()).build();
             osiamConnector.updateUser(userId, updateUser, accessToken);
@@ -74,8 +72,9 @@ public class RequesterJob implements Job {
     }
 
     private void replaceUser() {
-        System.out.println(jobName + ": Replace a User");
+        logMessage("Replace a User");
         String userId = OsiamContext.getInstance().retrieveSingleUserId();
+        logMessage("try to replace user with the id " + userId);
         if (!Strings.isNullOrEmpty(userId)) {
             User replaceUser = RandomUser.getNewUser();
             osiamConnector.replaceUser(userId, replaceUser, accessToken);
@@ -83,16 +82,16 @@ public class RequesterJob implements Job {
     }
 
     private void deleteUser() {
-        System.out.println(jobName + ": deleting a User");
-        System.out.println(jobName + ": get a Users");
+        logMessage("deleting a User");
         String userId = OsiamContext.getInstance().retrieveSingleUserId();
+        logMessage("try to delete user with the id " + userId);
         if (!Strings.isNullOrEmpty(userId)) {
             osiamConnector.deleteUser(userId, accessToken);
         }
     }
 
     private void searchUser() throws UnsupportedEncodingException {
-        System.out.println(jobName + ": searching for Users");
+        logMessage("searching for Users");
         String query = getCompletUserQueryString();
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers("filter=" + query,
                 accessToken);
@@ -100,6 +99,7 @@ public class RequesterJob implements Job {
             queryResult = osiamConnector.searchUsers("filter=",
                     accessToken);
         }
+        logMessage("found " + queryResult.getResources().size() + " users");
         OsiamContext.getInstance().setListOfUsers(queryResult.getResources());
     }
 
@@ -112,11 +112,16 @@ public class RequesterJob implements Job {
     }
 
     private void getUser() {
-        System.out.println(jobName + ": get a Users");
+        logMessage("get a Users");
         String userId = OsiamContext.getInstance().retrieveSingleUserId();
+        logMessage("try to getuser with id: " + userId);
         if (!Strings.isNullOrEmpty(userId)) {
             osiamConnector.getUser(userId, accessToken);
         }
+    }
+
+    private void logMessage(String message) {
+        System.out.println(jobName + ": " + message);
     }
 
 }
