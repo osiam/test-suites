@@ -35,11 +35,6 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class StressRequester {
 
-    protected static final String AUTH_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-auth-server";
-    protected static final String RESOURCE_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-resource-server";
-    protected static final String CLIENT_ID = "example-client";
-    protected static final String CLIENT_SECRET = "secret";
-
     public static void main(String[] args) {
 
         int number = 0;
