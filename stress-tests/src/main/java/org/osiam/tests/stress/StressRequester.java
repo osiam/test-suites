@@ -40,7 +40,6 @@ import org.quartz.impl.StdSchedulerFactory;
 public class StressRequester {
 
     public static void main(String[] args) {
-
         int number = 0;
 
         try {
@@ -48,17 +47,17 @@ public class StressRequester {
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
 
-//            addRequesterJob(scheduler, 500, number++);
-//            addRequesterJob(scheduler, 701, number++);
-//            addRequesterJob(scheduler, 902, number++);
-//            addRequesterJob(scheduler, 1103, number++);
-//            addRequesterJob(scheduler, 1304, number++);
-//
-//            addRequesterJob(scheduler, 555, number++);
-//            addRequesterJob(scheduler, 756, number++);
-//            addRequesterJob(scheduler, 957, number++);
-//            addRequesterJob(scheduler, 1158, number++);
-//            addRequesterJob(scheduler, 1359, number++);
+            addRequesterJob(scheduler, 500, number++);
+            addRequesterJob(scheduler, 701, number++);
+            addRequesterJob(scheduler, 902, number++);
+            addRequesterJob(scheduler, 1103, number++);
+            addRequesterJob(scheduler, 1304, number++);
+
+            addRequesterJob(scheduler, 555, number++);
+            addRequesterJob(scheduler, 756, number++);
+            addRequesterJob(scheduler, 957, number++);
+            addRequesterJob(scheduler, 1158, number++);
+            addRequesterJob(scheduler, 1359, number++);
             
             addAggregatorJib(scheduler);
         } catch (SchedulerException e) {
@@ -78,16 +77,16 @@ public class StressRequester {
         Date startDate = calendar.getTime(); 
         
         JobDetail job = newJob(AggregatorJob.class)
-                .withIdentity("a job", "a group")
+                .withIdentity("aggregator job", "aggregator")
                 .build();
 
         Trigger trigger = newTrigger()
-                .withIdentity("a trigger", " a group")
+                .withIdentity("aggregator trigger", "aggregator")
 //                .startAt(startDate)
                 .startNow()
                 .withSchedule(simpleSchedule()
 //                        .withIntervalInHours(12)
-                        .withIntervalInSeconds(15)
+                        .withIntervalInHours(3)
                         .repeatForever())
                 .build();
 
@@ -97,11 +96,11 @@ public class StressRequester {
     private static void addRequesterJob(Scheduler scheduler, long milliSeconds, int number) throws SchedulerException {
 
         JobDetail job = newJob(RequesterJob.class)
-                .withIdentity("r job" + number, "r group" + number)
+                .withIdentity("requester job " + number, "requester")
                 .build();
 
         Trigger trigger = newTrigger()
-                .withIdentity("r trigger" + number, "r group" + number)
+                .withIdentity("requester trigger " + number, "requester")
                 .startNow()
                 .withSchedule(simpleSchedule()
                         .withIntervalInMilliseconds(milliSeconds)

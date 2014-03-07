@@ -44,12 +44,14 @@ public class RequesterJob implements Job {
     private OsiamConnector osiamConnector;
     private AccessToken accessToken;
 
+    @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        jobName = context.getJobDetail().getKey().getName();
-        osiamConnector = OsiamContext.getInstance().getConnector(jobName);
-        accessToken = OsiamContext.getInstance().getValidAccessToken();
 
         try {
+            jobName = context.getJobDetail().getKey().getName();
+            osiamConnector = OsiamContext.getInstance().getConnector(jobName);
+            accessToken = OsiamContext.getInstance().getValidAccessToken();
+
             int i = (int) (Math.random() * 30 + 1);
 
             if (i > 0 && i <= 10) {
@@ -129,6 +131,7 @@ public class RequesterJob implements Job {
         String encoded = null;
         encoded = URLEncoder.encode("active eq \"true\""
                 + " and addresses.postalCode co \"" + getRandomNumber() + "\""
+                + " and NOT(username eq \"marissa\")"
                 + " and addresses.primary eq \"true\"", "UTF-8");
         return encoded;
     }

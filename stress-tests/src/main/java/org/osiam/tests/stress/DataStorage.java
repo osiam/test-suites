@@ -8,19 +8,22 @@ import java.util.Date;
 
 public class DataStorage {
 
-    public static void storeData(Metric metricData) throws IOException{
+    public static void storeData(String... values) throws IOException{
         
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("metricData.csv", true)));
         
-        out.println(getPrintLine(metricData));
+        out.println(getPrintLine(values));
         out.close();
     }
     
-    private static String getPrintLine(Metric metricData){
+    private static String getPrintLine(String... values){
         StringBuilder line = new StringBuilder();
         
-        line.append(new Date()).append(", ")
-        ;
+        line.append(new Date()).append(", ");
+        
+        for (String string : values) {
+            line.append(string).append(", ");
+        }
         return line.toString();
     }
     
