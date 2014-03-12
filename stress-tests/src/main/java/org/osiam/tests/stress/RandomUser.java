@@ -93,7 +93,7 @@ public class RandomUser {
                 .setTimezone("DE")
                 .setTitle("title" + getRandomNumber())
                 .setX509Certificates(x509Certificates)
-                // .addExtension(extension) TODO extension doesn't exist at the moment
+                .addExtension(extension)
                 .build();
     }
 
@@ -161,7 +161,9 @@ public class RandomUser {
 
     private static Extension getRandomExtension() {
         Extension extension = new Extension(EXTENSION_URN);
-        extension.addOrUpdateField("gender", "female");
+        
+        String gender = getRandomNumber()%2 == 0 ? "male" : "female";
+        extension.addOrUpdateField("gender", gender);
         extension.addOrUpdateField("age", new BigInteger("" + getRandomNumber()));
         return extension;
     }

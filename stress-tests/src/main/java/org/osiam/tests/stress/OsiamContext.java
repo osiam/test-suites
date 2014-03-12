@@ -35,8 +35,8 @@ import org.osiam.resources.scim.User;
 
 public class OsiamContext {
     private static OsiamContext contextSingelton = null;
-    private static final String AUTH_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-auth-server";
-    private static final String RESOURCE_ENDPOINT_ADDRESS = "http://localhost:8180/osiam-resource-server";
+    private static String AUTH_ENDPOINT_ADDRESS;
+    private static String RESOURCE_ENDPOINT_ADDRESS;
     private static final String CLIENT_ID = "example-client";
     private static final String CLIENT_SECRET = "secret";
 
@@ -74,12 +74,8 @@ public class OsiamContext {
     }
 
     public AccessToken getValidAccessToken() {
-        if (accessToken == null)
-        {
+        if (accessToken == null || accessToken.isExpired()) {
             accessToken = getConnector("accessToken").retrieveAccessToken();
-        }
-        if (accessToken.isExpired()) {
-            getConnector("accessToken").refreshAccessToken(accessToken, Scope.ALL);
         }
         return accessToken;
     }
@@ -88,14 +84,25 @@ public class OsiamContext {
         this.users = users;
     }
 
+    public void setResourcesEndpoint(String resourceEndpoint) {
+        AUTH_ENDPOINT_ADDRESS = resourceEndpoint + "/osiam-auth-server";
+        RESOURCE_ENDPOINT_ADDRESS = resourceEndpoint + "/osiam-resource-server";
+    }
+
     public synchronized String retrieveSingleUserId() {
         String userId = null;
         if (users.size() > 0) {
             int randomPosition = (int) (Math.random() * users.size());
             User user = users.get(randomPosition);
-            userId = user.getId();
-            users.remove(randomPosition);
+            if (!user.getUserName().equals("marissa")) {
+                userId = user.getId();
+                users.remove(randomPosition);
+            }
         }
         return userId;
+    }
+
+    public String getResourceEndpointAddress() {
+        return RESOURCE_ENDPOINT_ADDRESS;
     }
 }
