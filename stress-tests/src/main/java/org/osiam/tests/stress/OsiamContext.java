@@ -23,13 +23,9 @@
 
 package org.osiam.tests.stress;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.osiam.client.connector.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
@@ -50,7 +46,6 @@ public class OsiamContext {
     private List<User> users = new ArrayList<User>();
 
     private OsiamContext() {
-        loadConfig();
     }
 
     public static OsiamContext getInstance() {
@@ -60,35 +55,6 @@ public class OsiamContext {
         return contextSingelton;
     }
 
-    private void loadConfig(){
-        Properties prop = new Properties();
-        InputStream input = null;
-     
-        try {
-            input = new FileInputStream("src/main/resources/osiam.properties");
-     
-            prop.load(input);
-     
-            String port = prop.getProperty("osiam.server.port");
-            String host = prop.getProperty("osiam.server.host");
-            String scheme = prop.getProperty("osiam.server.http.scheme");
-            
-            AUTH_ENDPOINT_ADDRESS = scheme + "://" + host + ":" + port + "/osiam-auth-server";
-            RESOURCE_ENDPOINT_ADDRESS = scheme + "://" + host + ":" + port + "/osiam-resource-server";
-     
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-    
     public OsiamConnector getConnector(String key) {
         OsiamConnector osiamConnector = connectors.get(key);
         if (osiamConnector == null) {
@@ -108,12 +74,8 @@ public class OsiamContext {
     }
 
     public AccessToken getValidAccessToken() {
-        if (accessToken == null)
-        {
+        if (accessToken == null || accessToken.isExpired()) {
             accessToken = getConnector("accessToken").retrieveAccessToken();
-        }
-        if (accessToken.isExpired()) {
-            getConnector("accessToken").refreshAccessToken(accessToken, Scope.ALL);
         }
         return accessToken;
     }
@@ -122,18 +84,25 @@ public class OsiamContext {
         this.users = users;
     }
 
+    public void setResourcesEndpoint(String resourceEndpoint) {
+        AUTH_ENDPOINT_ADDRESS = resourceEndpoint + "/osiam-auth-server";
+        RESOURCE_ENDPOINT_ADDRESS = resourceEndpoint + "/osiam-resource-server";
+    }
+
     public synchronized String retrieveSingleUserId() {
         String userId = null;
         if (users.size() > 0) {
             int randomPosition = (int) (Math.random() * users.size());
             User user = users.get(randomPosition);
-            userId = user.getId();
-            users.remove(randomPosition);
+            if (!user.getUserName().equals("marissa")) {
+                userId = user.getId();
+                users.remove(randomPosition);
+            }
         }
         return userId;
     }
-    
-    public String getResourceEndpointAddess(){
+
+    public String getResourceEndpointAddress() {
         return RESOURCE_ENDPOINT_ADDRESS;
     }
 }

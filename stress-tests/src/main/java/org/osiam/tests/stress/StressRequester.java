@@ -43,6 +43,7 @@ public class StressRequester {
         int number = 0;
 
         try {
+            OsiamContext.getInstance().setResourcesEndpoint(args[0]);
             Scheduler scheduler;
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
@@ -58,8 +59,8 @@ public class StressRequester {
             addRequesterJob(scheduler, 957, number++);
             addRequesterJob(scheduler, 1158, number++);
             addRequesterJob(scheduler, 1359, number++);
-            
-            addAggregatorJib(scheduler);
+
+            addAggregatorJob(scheduler);
         } catch (SchedulerException e) {
             e.printStackTrace();
             System.out.print(e.getMessage());
@@ -67,32 +68,30 @@ public class StressRequester {
 
     }
 
-    private static void addAggregatorJib(Scheduler scheduler) throws SchedulerException{
+    private static void addAggregatorJob(Scheduler scheduler) throws SchedulerException {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
         calendar.set(Calendar.HOUR_OF_DAY, 19);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        Date startDate = calendar.getTime(); 
-        
+        Date startDate = calendar.getTime();
+
         JobDetail job = newJob(AggregatorJob.class)
                 .withIdentity("aggregator job", "aggregator")
                 .build();
 
         Trigger trigger = newTrigger()
                 .withIdentity("aggregator trigger", "aggregator")
-//                .startAt(startDate)
-                .startNow()
+                .startAt(startDate)
                 .withSchedule(simpleSchedule()
-//                        .withIntervalInHours(12)
-                        .withIntervalInHours(3)
+                        .withIntervalInHours(12)
                         .repeatForever())
                 .build();
 
         scheduler.scheduleJob(job, trigger);
     }
-    
+
     private static void addRequesterJob(Scheduler scheduler, long milliSeconds, int number) throws SchedulerException {
 
         JobDetail job = newJob(RequesterJob.class)

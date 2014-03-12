@@ -25,6 +25,8 @@ package org.osiam.tests.stress;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import org.osiam.client.connector.OsiamConnector;
@@ -44,9 +46,7 @@ public class RequesterJob implements Job {
     private OsiamConnector osiamConnector;
     private AccessToken accessToken;
 
-    @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-
         try {
             jobName = context.getJobDetail().getKey().getName();
             osiamConnector = OsiamContext.getInstance().getConnector(jobName);
@@ -69,8 +69,7 @@ public class RequesterJob implements Job {
             }
 
         } catch (Throwable e) {
-            System.out.println("Error at Job " + jobName + ": " + e.getMessage());
-            e.printStackTrace();
+            logError(e);
         }
     }
 
@@ -116,21 +115,26 @@ public class RequesterJob implements Job {
 
     private void searchUser() throws UnsupportedEncodingException {
         logMessage("searching for Users");
-        String query = getCompletUserQueryString();
+        int randomNumber = getRandomNumber();
+        String query = getCompletUserQueryString(randomNumber);
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers("filter=" + query,
                 accessToken);
         if (queryResult.getTotalResults() == 0) {
             queryResult = osiamConnector.searchUsers("filter=",
                     accessToken);
         }
-        logMessage("found " + queryResult.getResources().size() + " users");
+        StringBuilder ids = new StringBuilder();
+        for (User iterable_element : queryResult.getResources()) {
+            ids.append(iterable_element.getId()).append(", ");
+        }
+        logMessage("found " + queryResult.getResources().size() + " users. The random number in the postalcode was " + randomNumber + ". The found users are: " + ids.toString());
         OsiamContext.getInstance().setListOfUsers(queryResult.getResources());
     }
 
-    private String getCompletUserQueryString() throws UnsupportedEncodingException {
+    private String getCompletUserQueryString(int randomNumber) throws UnsupportedEncodingException {
         String encoded = null;
         encoded = URLEncoder.encode("active eq \"true\""
-                + " and addresses.postalCode co \"" + getRandomNumber() + "\""
+                + " and addresses.postalCode co \"" + randomNumber + "\""
                 + " and NOT(username eq \"marissa\")"
                 + " and addresses.primary eq \"true\"", "UTF-8");
         return encoded;
@@ -146,7 +150,18 @@ public class RequesterJob implements Job {
     }
 
     private void logMessage(String message) {
-        System.out.println(jobName + ": " + message);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS");
+        String dateOut = dateFormatter.format(new Date());
+        
+        System.out.println(dateOut + ": " + jobName + ": " + message);
+    }
+    
+    private void logError(Throwable e) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS");
+        String dateOut = dateFormatter.format(new Date());
+        
+        System.out.println("Error!! " + dateOut + ": " + jobName + ": " + e.getMessage());
+        e.printStackTrace();
     }
 
 }
