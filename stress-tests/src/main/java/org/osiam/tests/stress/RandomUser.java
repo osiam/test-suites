@@ -24,6 +24,8 @@
 package org.osiam.tests.stress;
 
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -142,8 +144,12 @@ public class RandomUser {
     }
 
     private static Photo getRandomPhoto() {
-        Photo photo = new Photo.Builder().setPrimary(true)
-                .setType(Photo.Type.PHOTO).setValue("username" + getRandomNumber() + ".jpg").build();
+        Photo photo = null;
+        try {
+            photo = new Photo.Builder().setPrimary(true)
+                    .setType(Photo.Type.PHOTO).setValue(new URI("username" + getRandomNumber() + ".jpg")).build();
+        } catch (URISyntaxException e) {
+        }
         return photo;
     }
 
