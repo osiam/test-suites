@@ -23,6 +23,8 @@
 
 package org.osiam.tests.stress;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -30,6 +32,9 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.exception.ConflictException;
+import org.osiam.client.exception.ForbiddenException;
+import org.osiam.client.exception.NoResultException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.UpdateUser;
@@ -37,15 +42,20 @@ import org.osiam.resources.scim.User;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
 public class RequesterJob implements Job {
 
+    final Logger logger = LoggerFactory.getLogger(RequesterJob.class);
+    
     private String jobName;
     private OsiamConnector osiamConnector;
     private AccessToken accessToken;
 
+    @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             jobName = context.getJobDetail().getKey().getName();
@@ -68,8 +78,14 @@ public class RequesterJob implements Job {
                 deleteUser();
             }
 
+        } catch (ConflictException | NoResultException | ForbiddenException ex) {
+            logError(ex);
         } catch (Throwable e) {
             logError(e);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            logger.error(jobName + ": " + sw.toString());
         }
     }
 
@@ -123,11 +139,6 @@ public class RequesterJob implements Job {
             queryResult = osiamConnector.searchUsers("filter=",
                     accessToken);
         }
-        StringBuilder ids = new StringBuilder();
-        for (User iterable_element : queryResult.getResources()) {
-            ids.append(iterable_element.getId()).append(", ");
-        }
-        logMessage("found " + queryResult.getResources().size() + " users. The random number in the postalcode was " + randomNumber + ". The found users are: " + ids.toString());
         OsiamContext.getInstance().setListOfUsers(queryResult.getResources());
     }
 

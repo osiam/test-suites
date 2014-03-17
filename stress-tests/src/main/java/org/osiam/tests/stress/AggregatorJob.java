@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,15 +44,20 @@ import org.osiam.client.oauth.AccessToken;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AggregatorJob implements Job {
 
+    final Logger logger = LoggerFactory.getLogger(AggregatorJob.class);
+    
     private String jobName;
     private AccessToken accessToken;
 
+    @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         jobName = context.getJobDetail().getKey().getName();
         accessToken = OsiamContext.getInstance().getValidAccessToken();
@@ -86,6 +92,10 @@ public class AggregatorJob implements Job {
             DataStorage.storeData(memoryUsage);
         } catch (Throwable e) {
             logError(e);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            logger.error(jobName + ": " + sw.toString());
         }
     }
 
