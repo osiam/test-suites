@@ -55,6 +55,7 @@ public class RequesterJob implements Job {
     private OsiamConnector osiamConnector;
     private AccessToken accessToken;
 
+    @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             jobName = context.getJobDetail().getKey().getName();
