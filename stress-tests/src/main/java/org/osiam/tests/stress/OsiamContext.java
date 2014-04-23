@@ -59,8 +59,8 @@ public class OsiamContext {
         OsiamConnector osiamConnector = connectors.get(key);
         if (osiamConnector == null) {
             OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
-                    setAuthServiceEndpoint(AUTH_ENDPOINT_ADDRESS).
-                    setResourceEndpoint(RESOURCE_ENDPOINT_ADDRESS).
+                    setAuthServerEndpoint(AUTH_ENDPOINT_ADDRESS).
+                    setResourceServerEndpoint(RESOURCE_ENDPOINT_ADDRESS).
                     setClientId(CLIENT_ID).
                     setClientSecret(CLIENT_SECRET).
                     setGrantType(GrantType.RESOURCE_OWNER_PASSWORD_CREDENTIALS).

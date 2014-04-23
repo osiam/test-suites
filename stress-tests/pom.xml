@@ -15,7 +15,7 @@
         <org.slf4j-version>1.7.6</org.slf4j-version>
         
         <!-- OSIAM -->
-        <osiam.connector4java.version>0.14-SNAPSHOT</osiam.connector4java.version>
+        <osiam.connector4java.version>0.15-SNAPSHOT</osiam.connector4java.version>
     </properties>
 
     <dependencies>

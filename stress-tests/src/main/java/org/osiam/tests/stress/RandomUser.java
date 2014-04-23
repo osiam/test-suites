@@ -166,12 +166,12 @@ public class RandomUser {
     }
 
     private static Extension getRandomExtension() {
-        Extension extension = new Extension(EXTENSION_URN);
+        Extension.Builder extensionBuilder = new Extension.Builder(EXTENSION_URN);
         
         String gender = getRandomNumber()%2 == 0 ? "male" : "female";
-        extension.addOrUpdateField("gender", gender);
-        extension.addOrUpdateField("age", new BigInteger("" + getRandomNumber()));
-        return extension;
+        extensionBuilder.setField("gender", gender);
+        extensionBuilder.setField("age", new BigInteger("" + getRandomNumber()));
+        return extensionBuilder.build();
     }
 
     private static int getRandomNumber() {
