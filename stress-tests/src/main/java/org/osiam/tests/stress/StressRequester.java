@@ -27,10 +27,6 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -69,13 +65,6 @@ public class StressRequester {
     }
 
     private static void addAggregatorJob(Scheduler scheduler) throws SchedulerException {
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY, 19);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date startDate = calendar.getTime();
 
         JobDetail job = newJob(AggregatorJob.class)
                 .withIdentity("aggregator job", "aggregator")
@@ -83,9 +72,9 @@ public class StressRequester {
 
         Trigger trigger = newTrigger()
                 .withIdentity("aggregator trigger", "aggregator")
-                .startAt(startDate)
+                .startNow()
                 .withSchedule(simpleSchedule()
-                        .withIntervalInHours(12)
+                        .withIntervalInMinutes(10)
                         .repeatForever())
                 .build();
 
