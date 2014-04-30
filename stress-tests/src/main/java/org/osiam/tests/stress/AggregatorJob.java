@@ -40,7 +40,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.osiam.client.connector.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
+import org.osiam.client.query.StringQueryBuilder;
+import org.osiam.resources.scim.SCIMSearchResult;
+import org.osiam.resources.scim.User;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -55,11 +59,13 @@ public class AggregatorJob implements Job {
     final Logger logger = LoggerFactory.getLogger(AggregatorJob.class);
     
     private String jobName;
+    private OsiamConnector osiamConnector;
     private AccessToken accessToken;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         jobName = context.getJobDetail().getKey().getName();
+        osiamConnector = OsiamContext.getInstance().getConnector(jobName);
         accessToken = OsiamContext.getInstance().getValidAccessToken();
 
         try {
@@ -88,8 +94,9 @@ public class AggregatorJob implements Job {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(content);
             String memoryUsage = "" + (rootNode.get("gauges").get("jvm.memory.total.used").get("value").asInt() / mb);
-
-            DataStorage.storeData(memoryUsage);
+            String totalUser = getTotalUsers();
+            
+            DataStorage.storeData(memoryUsage, totalUser);
         } catch (Throwable e) {
             logError(e);
             StringWriter sw = new StringWriter();
@@ -104,6 +111,14 @@ public class AggregatorJob implements Job {
         error.printStackTrace();
     }
 
+    private String getTotalUsers(){
+        String query = new StringQueryBuilder().setCount(1).build();
+        
+        SCIMSearchResult<User>  searchResult = osiamConnector.searchUsers(query, accessToken);
+        
+        return (new Long(searchResult.getTotalResults())).toString();
+    }
+    
     private void logError(String errorMessage) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS");
         String dateOut = dateFormatter.format(new Date());
