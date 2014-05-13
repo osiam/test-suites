@@ -31,11 +31,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.ConflictException;
 import org.osiam.client.exception.ForbiddenException;
 import org.osiam.client.exception.NoResultException;
 import org.osiam.client.oauth.AccessToken;
+import org.osiam.client.query.Query;
+import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
@@ -132,22 +134,21 @@ public class RequesterJob implements Job {
     private void searchUser() throws UnsupportedEncodingException {
         logMessage("searching for Users");
         int randomNumber = getRandomNumber();
-        String query = getCompletUserQueryString(randomNumber);
-        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers("filter=" + query,
+        Query query = getCompletUserQueryString(randomNumber);
+        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query,
                 accessToken);
         if (queryResult.getTotalResults() == 0) {
-            queryResult = osiamConnector.searchUsers("filter=",
+            queryResult = osiamConnector.searchUsers(new QueryBuilder().build(),
                     accessToken);
         }
         OsiamContext.getInstance().setListOfUsers(queryResult.getResources());
     }
 
-    private String getCompletUserQueryString(int randomNumber) throws UnsupportedEncodingException {
-        String encoded = null;
-        encoded = URLEncoder.encode("active eq \"true\""
+    private Query getCompletUserQueryString(int randomNumber) throws UnsupportedEncodingException {
+        Query encoded = new QueryBuilder().filter("active eq \"true\""
                 + " and addresses.postalCode co \"" + randomNumber + "\""
                 + " and NOT(username eq \"marissa\")"
-                + " and addresses.primary eq \"true\"", "UTF-8");
+                + " and addresses.primary eq \"true\"").build();
         return encoded;
     }
 
