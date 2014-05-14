@@ -27,9 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
-import org.osiam.client.oauth.GrantType;
 import org.osiam.client.oauth.Scope;
 import org.osiam.resources.scim.User;
 
@@ -62,11 +61,7 @@ public class OsiamContext {
                     setAuthServerEndpoint(AUTH_ENDPOINT_ADDRESS).
                     setResourceServerEndpoint(RESOURCE_ENDPOINT_ADDRESS).
                     setClientId(CLIENT_ID).
-                    setClientSecret(CLIENT_SECRET).
-                    setGrantType(GrantType.RESOURCE_OWNER_PASSWORD_CREDENTIALS).
-                    setUserName("marissa").
-                    setPassword("koala").
-                    setScope(Scope.ALL);
+                    setClientSecret(CLIENT_SECRET);
             osiamConnector = oConBuilder.build();
             connectors.put(key, osiamConnector);
         }
@@ -75,7 +70,7 @@ public class OsiamContext {
 
     public AccessToken getValidAccessToken() {
         if (accessToken == null || accessToken.isExpired()) {
-            accessToken = getConnector("accessToken").retrieveAccessToken();
+            accessToken = getConnector("accessToken").retrieveAccessToken("marissa", "koala", Scope.ALL);
         }
         return accessToken;
     }

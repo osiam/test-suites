@@ -40,9 +40,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
-import org.osiam.client.query.StringQueryBuilder;
+import org.osiam.client.query.Query;
+import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.User;
 import org.quartz.Job;
@@ -112,7 +113,7 @@ public class AggregatorJob implements Job {
     }
 
     private String getTotalUsers(){
-        String query = new StringQueryBuilder().setCount(1).build();
+        Query query = new QueryBuilder().count(1).build();
         
         SCIMSearchResult<User>  searchResult = osiamConnector.searchUsers(query, accessToken);
         
