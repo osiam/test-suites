@@ -44,7 +44,7 @@ import org.osiam.resources.scim.X509Certificate;
 
 public class RandomUser {
 
-    private static final String EXTENSION_URN = "com.osiam.stress.test";
+    private static final String EXTENSION_URN = "urn:org.osiam:scim:extensions:stress-tests";
 
     public static User getNewUser() {
         List<Address> addresses = new ArrayList<Address>();
@@ -167,8 +167,8 @@ public class RandomUser {
 
     private static Extension getRandomExtension() {
         Extension.Builder extensionBuilder = new Extension.Builder(EXTENSION_URN);
-        
-        String gender = getRandomNumber()%2 == 0 ? "male" : "female";
+
+        String gender = getRandomNumber() % 2 == 0 ? "male" : "female";
         extensionBuilder.setField("gender", gender);
         extensionBuilder.setField("age", new BigInteger("" + getRandomNumber()));
         return extensionBuilder.build();
