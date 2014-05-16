@@ -26,7 +26,6 @@ package org.osiam.tests.stress;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -52,7 +51,7 @@ import com.google.common.base.Strings;
 public class RequesterJob implements Job {
 
     final Logger logger = LoggerFactory.getLogger(RequesterJob.class);
-    
+
     private String jobName;
     private OsiamConnector osiamConnector;
     private AccessToken accessToken;
@@ -164,14 +163,14 @@ public class RequesterJob implements Job {
     private void logMessage(String message) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS");
         String dateOut = dateFormatter.format(new Date());
-        
+
         System.out.println(dateOut + ": " + jobName + ": " + message);
     }
-    
+
     private void logError(Throwable e) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS");
         String dateOut = dateFormatter.format(new Date());
-        
+
         System.out.println("Error!! " + dateOut + ": " + jobName + ": " + e.getMessage());
         e.printStackTrace();
     }
