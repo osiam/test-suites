@@ -32,14 +32,23 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StressRequester {
+
+    private final static Logger LOG = LoggerFactory.getLogger(StressRequester.class);
 
     public static void main(String[] args) {
         int number = 0;
 
         try {
-            OsiamContext.getInstance().setResourcesEndpoint(args[0]);
+            if (args.length > 0) {
+                OsiamContext.getInstance().setResourcesEndpoint(args[0]);
+            } else {
+                LOG.error("You need to set the root endpoint of your osiam server e.g. http://localhost:8080");
+                return;
+            }
             Scheduler scheduler;
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
@@ -97,5 +106,4 @@ public class StressRequester {
 
         scheduler.scheduleJob(job, trigger);
     }
-
 }
