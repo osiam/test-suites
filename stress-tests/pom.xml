@@ -22,13 +22,34 @@
     ~ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>org.osiam.tests</groupId>
     <artifactId>stress-tests</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>stress-tests</name>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <name>OSIAM stress tests</name>
+    <description>The tests to stress OSIAMs server with scheduled connector4java requests</description>
+    <url>https://github.com/osiam/test-suites</url>
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>OSIAM Team</name>
+            <email>info@osiam.org</email>
+            <timezone>+1</timezone>
+            <organization>tarent solutions GmbH</organization>
+            <organizationUrl>http://www.tarent.de</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,50 +57,102 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
         <java.version>1.7</java.version>
 
-        <org.slf4j-version>1.7.7</org.slf4j-version>
-        <org.quartz-scheduler-version>2.2.1</org.quartz-scheduler-version>
-
-        <!-- OSIAM -->
-        <osiam.connector4java.version>0.16-SNAPSHOT</osiam.connector4java.version>
+        <version.quartz>2.2.1</version.quartz>
+        <version.osiam.connector4java>1.5-SNAPSHOT</version.osiam.connector4java>
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>connector4java</artifactId>
-            <version>${osiam.connector4java.version}</version>
+            <version>${version.osiam.connector4java}</version>
         </dependency>
 
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>${org.quartz-scheduler-version}</version>
+            <version>${version.quartz}</version>
         </dependency>
 
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
-            <version>${org.quartz-scheduler-version}</version>
+            <version>${version.quartz}</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${org.slf4j-version}</version>
+            <version>1.7.10</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-apache-connector</artifactId>
+            <version>2.17</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>osiam releases repo</id>
+            <url>https://maven-repo.evolvis.org/releases</url>
+        </repository>
+        <repository>
+            <id>osiam snapshots repo</id>
+            <url>https://maven-repo.evolvis.org/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.2</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <mainClass>org.osiam.tests.stress.StressRequester</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                    <includeScope>runtime</includeScope>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
