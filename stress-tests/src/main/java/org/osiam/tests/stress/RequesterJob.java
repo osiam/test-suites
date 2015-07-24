@@ -137,18 +137,16 @@ public class RequesterJob implements Job {
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query,
                 accessToken);
         if (queryResult.getTotalResults() == 0) {
-            queryResult = osiamConnector.searchUsers(new QueryBuilder().build(),
-                    accessToken);
+            queryResult = osiamConnector.searchUsers(new QueryBuilder().build(), accessToken);
         }
         OsiamContext.getInstance().setListOfUsers(queryResult.getResources());
     }
 
     private Query getCompletUserQueryString(int randomNumber) throws UnsupportedEncodingException {
-        Query encoded = new QueryBuilder().filter("active eq \"true\""
+        return new QueryBuilder().filter("active eq \"true\""
                 + " and addresses.postalCode co \"" + randomNumber + "\""
-                + " and NOT(username eq \"marissa\")"
+                + " and NOT(username eq \"admin\")"
                 + " and addresses.primary eq \"true\"").build();
-        return encoded;
     }
 
     private void getUser() {
@@ -174,5 +172,4 @@ public class RequesterJob implements Job {
         System.out.println("Error!! " + dateOut + ": " + jobName + ": " + e.getMessage());
         e.printStackTrace();
     }
-
 }

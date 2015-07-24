@@ -70,7 +70,7 @@ public class OsiamContext {
 
     public AccessToken getValidAccessToken() {
         if (accessToken == null || accessToken.isExpired()) {
-            accessToken = getConnector("accessToken").retrieveAccessToken("marissa", "koala", Scope.ALL);
+            accessToken = getConnector("accessToken").retrieveAccessToken("admin", "koala", Scope.ALL);
         }
         return accessToken;
     }
@@ -89,7 +89,7 @@ public class OsiamContext {
         if (users.size() > 0) {
             int randomPosition = (int) (Math.random() * users.size());
             User user = users.get(randomPosition);
-            if (!user.getUserName().equals("marissa")) {
+            if (!user.getUserName().equals("admin")) {
                 userId = user.getId();
                 users.remove(randomPosition);
             }
