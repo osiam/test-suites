@@ -28,7 +28,7 @@ Setup
 -----
 
 After completing the [Installation](../INSTALLATION.md), you have to import an extension which will be need to run these tests.
-Simple run the [sql file](https://github.com/osiam/test-suites/blob/master/stress-tests/src/main/resources/sql/extension_registration.sql).
+Simple run the [sql file](https://github.com/osiam/test-suites/blob/master/stress-tests/src/main/sql/extension_registration.sql).
 
 How to run the stress tests
 ---------------------------
