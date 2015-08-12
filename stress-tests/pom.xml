@@ -58,7 +58,7 @@
         <java.version>1.7</java.version>
 
         <version.quartz>2.2.1</version.quartz>
-        <version.osiam.connector4java>1.6-SNAPSHOT</version.osiam.connector4java>
+        <version.osiam.connector4java>1.7-SNAPSHOT</version.osiam.connector4java>
     </properties>
 
     <dependencies>

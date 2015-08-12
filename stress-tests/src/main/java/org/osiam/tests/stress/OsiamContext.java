@@ -70,7 +70,7 @@ public class OsiamContext {
 
     public AccessToken getValidAccessToken() {
         if (accessToken == null || accessToken.isExpired()) {
-            accessToken = getConnector("accessToken").retrieveAccessToken("admin", "koala", Scope.ALL);
+            accessToken = getConnector("accessToken").retrieveAccessToken("admin", "koala", Scope.ADMIN);
         }
         return accessToken;
     }
