@@ -1,9 +1,8 @@
-test-suites [![Build Status](https://travis-ci.org/osiam/test-suites.png?branch=master)](https://travis-ci.org/osiam/test-suites)
-===========
+**Deprecated**
 
-The following projects are part of the OSIAM test-suites:
+This repo has been split. You can find the performance- and stress-tests repos here:
 
-* [Performance Tests](performance-tests/README.md)
-* [Stress Tests](stress-tests/README.md)
+* [performance-tests](https://github.com/osiam/performance-tests)
+* [stress-tests](https://github.com/osiam/stress-tests)
 
-For running the test-suites please follow the [installation steps](INSTALLATION.md).
+For more general information about OSIAM look at the OSIAM main repo: https://github.com/osiam/osiam
